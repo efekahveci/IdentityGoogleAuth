@@ -14,6 +14,30 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+builder.Services.Configure<IdentityOptions>(opt => {
+
+    opt.Password.RequireDigit = true;
+    opt.Password.RequireLowercase = true;
+    opt.Password.RequireUppercase = true;
+    opt.Password.RequireNonAlphanumeric = true;
+    opt.Password.RequiredLength = 8;
+    opt.Lockout.AllowedForNewUsers = true;
+    opt.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    opt.Lockout.MaxFailedAccessAttempts = 5;
+    opt.User.RequireUniqueEmail = false;
+});
+
+builder.Services.ConfigureApplicationCookie(opt => {
+    opt.Cookie.HttpOnly = true;
+    opt.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    opt.LoginPath = "/Identity/Account/Login";
+    opt.AccessDeniedPath = "/Identity/Account/AccessDenied";
+
+    opt.SlidingExpiration = true;
+});
+})
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -33,6 +57,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
