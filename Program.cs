@@ -36,7 +36,13 @@ builder.Services.ConfigureApplicationCookie(opt => {
 
     opt.SlidingExpiration = true;
 });
-})
+
+builder.Services.AddAuthentication()
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration?["Auth:Google"] ?? throw new InvalidOperationException("Google Client ID not found.");
+        options.ClientSecret = builder.Configuration?["Auth:Google:Secret"] ?? throw new InvalidOperationException("Google Client Secret not found.");
+    });
 
 var app = builder.Build();
 
